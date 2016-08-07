@@ -20,7 +20,7 @@
     <div id="map"></div>
     <script>
       function setPosition(pos) {
-        map.setView([pos.latitude, pos.longitude], 14);
+        map.setView([pos.coords.latitude, pos.coords.longitude], 14);
         getOsvTraces();
       }
       function noPosition(posError) {
