@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>My Web Map</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://mapzen.com/js/mapzen.css">
+    <script src="https://mapzen.com/js/mapzen.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <style>
+      #map {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+    html,body{margin: 0; padding: 0}
+  </style>
+
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      function setPosition(pos) {
+        map.setView([pos.latitude, pos.longitude], 14);
+        getOsvTraces();
+      }
+      function noPosition(posError) {
+        switch(posError.code) {
+          case 1: // denied
+            console.log('user denied access to current position');
+            break;
+          case 2: // unavailable
+            console.log('position unavailable');
+            break;
+          case 3: //timeout
+            console.log('position acquisition timed out');
+            break;
+        }
+        map.setView([52.0, 5.0], 8);
+        getOsvTraces();
+      }
+
+      function getOsvTraces() {
+        var bbox = map.getBounds();
+        var bbTopLeft = bbox.getNorth() + "," + bbox.getWest();
+        var bbBottomRight = bbox.getSouth() + "," + bbox.getEast();
+        console.log(bbBottomRight);
+        // bbTopLeft=37.873227357246435%2C-122.684326171875&bbBottomRight=37.64740301352141%2C-121.83906555175781&drawTracks=&platform=web&page=5&ipp=3000&action=false&zoom=11
+        $.ajax({
+          "url": "http://openstreetview.com/tracks",
+          "method": "POST",
+          "data": {
+            "bbTopLeft": bbTopLeft,
+            "bbBottomRight": bbBottomRight
+          }
+        });
+      }
+      var map = L.Mapzen.map('map', {
+        scene: L.Mapzen.HouseStyles.Refill
+      });
+      navigator.geolocation.getCurrentPosition(setPosition, noPosition);
+    </script>
+  </body>
+</html>
